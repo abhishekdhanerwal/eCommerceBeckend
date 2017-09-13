@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: ePurchase
+  data:
+    mongodb:
+      database: ePurchase
