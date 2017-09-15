@@ -22,30 +22,31 @@ import javax.validation.constraints.Size;
 /**
  * Created by Get It on 9/8/2017.
  */
-@Document(collection="user")
+@Document(collection = "user")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class User implements UserDetails{
+public class User implements UserDetails {
 
     @Id
     private String id;
     @Size(min = 1, max = 30, message = "{user.userName.size}")
     @Pattern(regexp = "^[a-zA-Z ]*$", message = "{user.userName.alphabet}")
     private String userName;
-    @Indexed(unique= true)
+    @Indexed(unique = true)
     @NotBlank(message = "{user.email.required}")
     @Pattern(regexp = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$", message = "{user.email.format}")
     private String email;
     private String passwordHash;
     @Indexed(unique = true)
     @Size(min = 10, max = 10, message = "{user.mobile.size}")
-    @Pattern(regexp = "^[1-9][0-9]*$" , message = "{user.mobile.number}")
+    @Pattern(regexp = "^[1-9][0-9]*$", message = "{user.mobile.number}")
     @NotNull(message = "{user.mobile.required}")
     private String mobile;
     private Role role;
+
     public User() {
     }
 
-    public User(String userName, String email, String passwordHash, String mobile,Role role) {
+    public User(String userName, String email, String passwordHash, String mobile, Role role) {
         this.userName = userName;
         this.email = email;
         this.passwordHash = encodePassword(passwordHash);
@@ -57,6 +58,7 @@ public class User implements UserDetails{
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
     }
+
     @Override
     public String getPassword() {
         return passwordHash;
@@ -90,8 +92,12 @@ public class User implements UserDetails{
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
     }
+
     @JsonIgnore
-    public String getPasswordHash(){return passwordHash;}
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
     public String getEmail() {
         return email;
     }
@@ -116,7 +122,7 @@ public class User implements UserDetails{
         this.mobile = mobile;
     }
 
-    public String encodePassword(String password){
+    public String encodePassword(String password) {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         return bCryptPasswordEncoder.encode(password);
     }

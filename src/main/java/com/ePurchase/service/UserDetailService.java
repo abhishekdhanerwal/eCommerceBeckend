@@ -23,11 +23,11 @@ public class UserDetailService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = repository.findByEmailIgnoreCase(email);
-                if(user==null) {
-                    throw new UsernameNotFoundException(String.format("User with email=%s was not found", email));
-                }else{
-                    return user;
-                }
+        if (user == null) {
+            throw new UsernameNotFoundException(String.format("User with email=%s was not found", email));
+        } else {
+            return user;
+        }
 
     }
 }

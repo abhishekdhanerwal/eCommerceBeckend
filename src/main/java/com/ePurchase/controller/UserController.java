@@ -37,55 +37,56 @@ public class UserController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @RequestMapping(value="/createUser", method = RequestMethod.POST)
-    public ResponseEntity<?> createUser(@RequestBody User user){
+    @RequestMapping(value = "/createUser", method = RequestMethod.POST)
+    public ResponseEntity<?> createUser(@RequestBody User user) {
 
-        if(user!=null){
-            if(isEmpty(user.getEmail())){
+        if (user != null) {
+            if (isEmpty(user.getEmail())) {
                 throw new BadClientDataException("Invalid user email");
             }
-            if(isEmpty(user.getMobile())){
+            if (isEmpty(user.getMobile())) {
                 throw new BadClientDataException("Invalid user mobile");
             }
-         List<String> userAlreadyExistFlag = userService.findIfUserAlreadyExist(user);
-            if(userAlreadyExistFlag.isEmpty()){
-                User savedUser = userService.createUser(user);
-                return new ResponseEntity<User>(savedUser, HttpStatus.CREATED);
+            String authorizedUserErrorMsg = userService.findIfUserIsAuthorizedToCreateUser(user);
+            if (isEmpty(authorizedUserErrorMsg)) {
+                List<String> userAlreadyExistFlag = userService.findIfUserAlreadyExist(user);
+                if (userAlreadyExistFlag.isEmpty()) {
+                    User savedUser = userService.createUser(user);
+                    return new ResponseEntity<User>(savedUser, HttpStatus.CREATED);
+                } else {
+                    return new ResponseEntity<List<String>>(userAlreadyExistFlag, HttpStatus.BAD_REQUEST);
+                }
+            } else {
+                return new ResponseEntity<String>(authorizedUserErrorMsg, HttpStatus.OK);
             }
-            else{
-                return new ResponseEntity<List<String>>(userAlreadyExistFlag, HttpStatus.BAD_REQUEST);
-            }
-        }
-    else{
+        } else {
             throw new BadClientDataException("Invalid user details");
         }
-
     }
 
-    @RequestMapping(value="/updateUser", method = RequestMethod.PATCH)
-    public ResponseEntity<?> updateUser(@RequestBody User user){
-            if(user!=null) {
-                List<String> validationErrorsList = userService.userValidation(user);
-                if(validationErrorsList.isEmpty()) {
-                    String emailReadOnlyAccessError = userService.checkForEmailReadOnlyAccess(user);
-                    if(isEmpty(emailReadOnlyAccessError)){
-                        throw new BadClientDataException(emailReadOnlyAccessError);
-                    }
-                    else{
-                        User updateduser = userService.updateUser(user);
-                        return new ResponseEntity<User>(updateduser,HttpStatus.CREATED);
-                    }
-                }else{
-                    throw new BadClientDataException(validationErrorsList.stream().toArray(String[]::new));
+    @RequestMapping(value = "/updateUser", method = RequestMethod.PATCH)
+    public ResponseEntity<?> updateUser(@RequestBody User user) {
+        if (user != null) {
+            List<String> validationErrorsList = userService.userValidation(user);
+            if (validationErrorsList.isEmpty()) {
+                String emailReadOnlyAccessError = userService.checkForEmailReadOnlyAccess(user);
+                if (isEmpty(emailReadOnlyAccessError)) {
+                    throw new BadClientDataException(emailReadOnlyAccessError);
+                } else {
+                    User updateduser = userService.updateUser(user);
+                    return new ResponseEntity<User>(updateduser, HttpStatus.CREATED);
                 }
-            }else{
-                throw new BadClientDataException("user cannot be null");
+            } else {
+                throw new BadClientDataException(validationErrorsList.stream().toArray(String[]::new));
             }
+        } else {
+            throw new BadClientDataException("user cannot be null");
+        }
     }
 
-    @RequestMapping(value="/changePassword", method = RequestMethod.POST)
+    @RequestMapping(value = "/changePassword", method = RequestMethod.POST)
     public ResponseEntity<?> changePassword(@RequestBody Map<String, String> passwords,
-                                            UsernamePasswordAuthenticationToken principal){
+                                            UsernamePasswordAuthenticationToken principal) {
 
         String oldPassword = passwords.get("oldPassword");
         String newPassword = passwords.get("newPassword");
@@ -102,6 +103,15 @@ public class UserController {
             currentUser = userService.createUser(currentUser);
             return new ResponseEntity<User>(currentUser, HttpStatus.OK);
         }
+    }
+
+    @RequestMapping(value = "/signup", method = RequestMethod.POST)
+    public ResponseEntity<?> signUp(@RequestBody User user) {
+
+        String passwordHash = userService.setUserPassword(user.getPassword());
+        user.setPasswordHash(passwordHash);
+        user = userService.createUser(user);
+        return new ResponseEntity<User>(user, HttpStatus.OK);
     }
 
 

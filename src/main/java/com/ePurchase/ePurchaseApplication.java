@@ -24,8 +24,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import javax.servlet.Filter;
 import java.security.Principal;
+
+import javax.servlet.Filter;
 
 /**
  * Created by Get It on 9/8/2017.
@@ -46,7 +47,9 @@ public class ePurchaseApplication extends WebSecurityConfigurerAdapter {
                 .requestMatchers()
                 .antMatchers("/login")
                 .and()
-                .authorizeRequests().anyRequest().authenticated()
+                .authorizeRequests()
+                .antMatchers("/user/signup").permitAll()
+                .anyRequest().authenticated()
                 .and()
                 .csrf().disable();
     }
