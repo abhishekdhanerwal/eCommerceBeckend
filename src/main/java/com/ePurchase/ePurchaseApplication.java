@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -48,7 +49,7 @@ public class ePurchaseApplication extends WebSecurityConfigurerAdapter {
                 .antMatchers("/login")
                 .and()
                 .authorizeRequests()
-                .antMatchers("/user/signup").permitAll()
+                .antMatchers("/user/signup","getCategoryProducts").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .csrf().disable();
@@ -73,6 +74,10 @@ public class ePurchaseApplication extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService).passwordEncoder(new BCryptPasswordEncoder());
+    }
+    @Bean
+    public RestTemplate restTemplate(){
+        return new RestTemplate();
     }
 
     @Override

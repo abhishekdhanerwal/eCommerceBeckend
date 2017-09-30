@@ -1,8 +1,10 @@
 package com.ePurchase.controller;
 
+import com.ePurchase.domain.Product;
 import com.ePurchase.domain.User;
 import com.ePurchase.exception.BadClientDataException;
 import com.ePurchase.service.UserService;
+import com.ePurchase.utils.ItemLookupUtility;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Map;
@@ -27,12 +30,15 @@ import static org.springframework.util.StringUtils.isEmpty;
 @RequestMapping("/user")
 public class UserController {
 
-
+    private RestTemplate restTemplate;
     private UserService userService;
     private PasswordEncoder passwordEncoder;
 
+
+
     @Autowired
-    public UserController(UserService userService, PasswordEncoder passwordEncoder) {
+    public UserController(RestTemplate restTemplate, UserService userService, PasswordEncoder passwordEncoder) {
+        this.restTemplate = restTemplate;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
     }
@@ -114,5 +120,13 @@ public class UserController {
         return new ResponseEntity<User>(user, HttpStatus.OK);
     }
 
+    @RequestMapping(value="/getNavigationBoard" , method = RequestMethod.GET)
+    public List<Product> getProductsNavigation(){
+        ItemLookupUtility itemLookupUtility = new ItemLookupUtility();
+        String requestUrl = itemLookupUtility.getRequestUrl("976390031");
+        List<Product> products = itemLookupUtility.fetchTitle(requestUrl);
+        return products;
 
+    }
 }
+
