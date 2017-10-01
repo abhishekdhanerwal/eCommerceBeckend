@@ -1,5 +1,6 @@
 package com.ePurchase.service;
 
+import com.ePurchase.domain.Product;
 import com.ePurchase.domain.User;
 
 import java.util.List;
@@ -24,4 +25,10 @@ public interface UserService {
     String setUserPassword(String password);
 
     String findIfUserIsAuthorizedToCreateUser(User user);
+
+    User addItemToCart(String userId, String itemId);
+
+    List<Product> getCartItems(String userId);
+
+    List<Product> getProductsNavigation(String nodeId);
 }

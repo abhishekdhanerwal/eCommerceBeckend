@@ -11,8 +11,13 @@ public class Product {
 
     private String id;
     private String imageUrl;
+    private String asinId;
+    private String title;
     private List<String> feature = new ArrayList<>();
     private String amount;
+
+    public Product() {
+    }
 
     public String getAmount() {
         return amount;
@@ -36,5 +41,21 @@ public class Product {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public String getAsinId() {
+        return asinId;
+    }
+
+    public void setAsinId(String asinId) {
+        this.asinId = asinId;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

@@ -1,9 +1,12 @@
 package com.ePurchase.serviceImpl;
 
 import com.ePurchase.Repository.UserRepository;
+import com.ePurchase.domain.Product;
 import com.ePurchase.domain.User;
 import com.ePurchase.enums.Role;
+import com.ePurchase.exception.BadClientDataException;
 import com.ePurchase.service.UserService;
+import com.ePurchase.utils.ItemLookupUtility;
 import com.ePurchase.utils.ObjectMerger;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,4 +103,67 @@ public class UserServiceImpl implements UserService {
         }
         return "";
     }
+
+    @Override
+    public User addItemToCart(String userId, String itemId){
+
+        if(isEmpty(userId)){
+            throw new BadClientDataException("Invalid user id");
+        }
+        if(isEmpty(itemId)){
+            throw new BadClientDataException("Invalid item id");
+        }
+        User user = userRepository.findOne(userId);
+        boolean flag = checkIfItemIsAlreadyInCart(user.getItemId(),itemId);
+            if(!flag){
+                user.getItemId().add(itemId);
+                userRepository.save(user);
+            }
+            else {
+                throw new BadClientDataException("Item already in cart");
+            }
+            return user;
+    }
+
+    @Override
+    public List<Product> getCartItems(String userId){
+        String url = null;
+        List<Product> productList = new ArrayList<>();
+        if(isEmpty(userId)){
+            throw new BadClientDataException("Invalid user id.");
+        }
+        else{
+            User user = userRepository.findOne(userId);
+            if(!user.getItemId().isEmpty()){
+                for(String id : user.getItemId()){
+                    url = ItemLookupUtility.getRequestUrlUsingAsinId(id);
+                    productList.addAll(ItemLookupUtility.fetchTitle(url));
+                }
+            }
+        }
+        return productList;
+    }
+
+    @Override
+    public List<Product> getProductsNavigation(String nodeId){
+        String url = null;
+        if(isEmpty(nodeId)){
+            throw new BadClientDataException("Invalid node Id.");
+        }
+        url = ItemLookupUtility.getRequestUrlForSearchIndexId(nodeId);
+        List<Product> productList = ItemLookupUtility.fetchTitle(url);
+        return productList;
+
+    }
+
+    private boolean checkIfItemIsAlreadyInCart(List<String> itemIds, String itemId) {
+
+        if(itemIds.contains(itemId))
+            return true;
+        else
+            return false;
+    }
+
+
+
 }

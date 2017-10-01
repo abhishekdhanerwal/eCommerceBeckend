@@ -29,31 +29,21 @@ public class ItemLookupUtility {
     private static final String ITEM_ID = "0545010225";
 
 
-    public String getRequestUrl(String browseNodeId) {
+    public static  String getRequestUrlForSearchIndexId(String browseNodeId) {
 
-        SignedRequestsHelper helper = null;
-
-        try {
-            helper = SignedRequestsHelper.getInstance(ENDPOINT, ACCESS_KEY_ID, SECRET_KEY);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        }
-
-
+        SignedRequestsHelper helper = getSignedRequestHelper();
         String requestUrl = null;
-        String title = null;
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Service", "AWSECommerceService");
         params.put("Operation", "ItemSearch");
         params.put("AWSAccessKeyId", ACCESS_KEY_ID);
         params.put("AssociateTag", "vijender9423-21");
-        params.put("BrowseNodeId", "1968120031");
-        params.put("SearchIndex","Apparel");
-        params.put("Keywords","Apparel");
+        params.put("BrowseNodeId", browseNodeId);
+        params.put("SearchIndex", "Apparel");
+        params.put("Sort", "-price");
+        params.put("ItemPage", "1");
+        params.put("Keywords", "Apparel");
         params.put("ResponseGroup", "Images,ItemAttributes,Offers");
         requestUrl = helper.sign(params);
 
@@ -65,60 +55,91 @@ public class ItemLookupUtility {
         params.put("BrowseNodeId", "976390031");
         params.put("ResponseGroup", "BrowseNodeInfo");
         requestUrl = helper.sign(params);*/
-        System.out.println("URL*** "+ requestUrl);
+        System.out.println("URL*** " + requestUrl);
         return requestUrl;
     }
 
+    private static final SignedRequestsHelper getSignedRequestHelper() {
 
+        SignedRequestsHelper helper = null;
+        try {
+            helper = SignedRequestsHelper.getInstance(ENDPOINT, ACCESS_KEY_ID, SECRET_KEY);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        }
+        return helper;
+    }
 
-
-
-    /*
-     * Utility function to fetch the response from the service and extract the
-     * title from the XML.
-     */
-    public List<Product> fetchTitle(String requestUrl) {
-        String title = null;
+    public static List<Product> fetchTitle(String requestUrl) {
+        String productInfo = null;
         List<Product> productList = new ArrayList<>();
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document doc = db.parse(requestUrl);
-            NodeList nList  = doc.getElementsByTagName("Item");
+            NodeList nList = doc.getElementsByTagName("Item");
             for (int temp = 0; temp < nList.getLength(); temp++) {
                 Product product = new Product();
                 Node nNode = nList.item(temp);
-                System.out.println("\nCurrent Element :"+temp);
+
+                System.out.println("\nCurrent Element :" + temp);
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
                     Element eElement = (Element) nNode;
-                    String productUrl = eElement.getElementsByTagName("DetailPageURL").item(0).getTextContent();
-                    product.setImageUrl(productUrl);
-                    String imageUrl = eElement.getElementsByTagName("LargeImage").item(0).getTextContent();
-                    product.setImageUrl(imageUrl);
-                    if (eElement.getElementsByTagName("Price").getLength() > 0) {
-                      Element priceElement = (Element) eElement.getElementsByTagName("Price").item(0);
+                    productInfo = eElement.getElementsByTagName("DetailPageURL").item(0).getTextContent();
+                    product.setImageUrl(productInfo);
+                    productInfo = eElement.getElementsByTagName("Title").item(0).getTextContent();
+                    product.setTitle(productInfo);
+                    productInfo = eElement.getElementsByTagName("ASIN").item(0).getTextContent();
+                    product.setAsinId(productInfo);
+                    if (eElement.getElementsByTagName("LargeImage").getLength() > 0) {
+                        productInfo = eElement.getElementsByTagName("LargeImage").item(0).getTextContent();
+                        product.setImageUrl(productInfo);
+                    }
+                    if (eElement.getElementsByTagName("LowestNewPrice").getLength() > 0) {
+                        Element priceElement = (Element) eElement.getElementsByTagName("LowestNewPrice").item(0);
                         if (priceElement.getElementsByTagName("FormattedPrice").getLength() > 0) {
-                            String price = priceElement.getElementsByTagName("FormattedPrice").item(0).getTextContent();
-                            product.setAmount(price);
+                            productInfo = priceElement.getElementsByTagName("FormattedPrice").item(0).getTextContent();
+                            product.setAmount(productInfo);
                         }
                     }
                     setProductFeatures(product, eElement);
-                    }
-                    productList.add(product);
                 }
+                productList.add(product);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         return productList;
     }
 
-    private void setProductFeatures(Product product, Element eElement) {
-        int i=0;
-        while(i<eElement.getElementsByTagName("Feature").getLength()){
+    private static void setProductFeatures(Product product, Element eElement) {
+        int i = 0;
+        while (i < eElement.getElementsByTagName("Feature").getLength()) {
             String feature = eElement.getElementsByTagName("Feature").item(i).getTextContent();
             product.getFeature().add(feature);
             i++;
         }
+    }
+
+    public static String getRequestUrlUsingAsinId(String asinId) {
+
+        SignedRequestsHelper helper = getSignedRequestHelper();
+        String requestUrl = null;
+
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("Service", "AWSECommerceService");
+        params.put("Operation", "ItemLookup");
+        params.put("AWSAccessKeyId", ACCESS_KEY_ID);
+        params.put("AssociateTag", "vijender9423-21");
+        params.put("ItemId", "B01J77UN8K");
+        params.put("IdType", "ASIN");
+        params.put("ResponseGroup", "Images,ItemAttributes,Offers");
+        requestUrl = helper.sign(params);
+        return requestUrl;
     }
 }

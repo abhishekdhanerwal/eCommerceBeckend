@@ -4,7 +4,6 @@ import com.ePurchase.domain.Product;
 import com.ePurchase.domain.User;
 import com.ePurchase.exception.BadClientDataException;
 import com.ePurchase.service.UserService;
-import com.ePurchase.utils.ItemLookupUtility;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -33,8 +33,6 @@ public class UserController {
     private RestTemplate restTemplate;
     private UserService userService;
     private PasswordEncoder passwordEncoder;
-
-
 
     @Autowired
     public UserController(RestTemplate restTemplate, UserService userService, PasswordEncoder passwordEncoder) {
@@ -120,12 +118,24 @@ public class UserController {
         return new ResponseEntity<User>(user, HttpStatus.OK);
     }
 
-    @RequestMapping(value="/getNavigationBoard" , method = RequestMethod.GET)
-    public List<Product> getProductsNavigation(){
-        ItemLookupUtility itemLookupUtility = new ItemLookupUtility();
-        String requestUrl = itemLookupUtility.getRequestUrl("976390031");
-        List<Product> products = itemLookupUtility.fetchTitle(requestUrl);
-        return products;
+    @RequestMapping(value="{nodeId}/getNavigationBoard" , method = RequestMethod.GET)
+    public ResponseEntity<?> getProductsNavigation(@PathVariable String nodeId){
+
+        List<Product> products  =  userService.getProductsNavigation(nodeId);
+        return new ResponseEntity<List<Product>>(products,HttpStatus.OK);
+    }
+
+    @RequestMapping(value="/{userId}/addToCart", method = RequestMethod.POST)
+    public ResponseEntity<?> addItemToCart(@PathVariable String userId, @RequestBody String itemId){
+        User user = userService.addItemToCart(userId,itemId);
+        return new ResponseEntity<User>(user,HttpStatus.OK);
+    }
+
+    @RequestMapping(value="/{userId}/getCartItems", method = RequestMethod.GET)
+    public ResponseEntity<?> getCartItems(@PathVariable String userId){
+
+        List<Product> productList = userService.getCartItems(userId);
+        return new ResponseEntity<List<Product>>(productList,HttpStatus.OK);
 
     }
 }

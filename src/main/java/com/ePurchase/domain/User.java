@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -42,6 +43,7 @@ public class User implements UserDetails {
     @NotNull(message = "{user.mobile.required}")
     private String mobile;
     private Role role;
+    private List<String> itemId;
 
     public User() {
     }
@@ -137,5 +139,13 @@ public class User implements UserDetails {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public List<String> getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(List<String> itemId) {
+        this.itemId = itemId;
     }
 }
