@@ -13,8 +13,12 @@ public class Product {
     private String imageUrl;
     private String asinId;
     private String title;
+    private String itemURL;
     private List<String> feature = new ArrayList<>();
+    private List<String> colors = new ArrayList<>();
+    private String brand;
     private String amount;
+    private String reviewUrl;
 
     public Product() {
     }
@@ -57,5 +61,37 @@ public class Product {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getItemURL() {
+        return itemURL;
+    }
+
+    public void setItemURL(String itemURL) {
+        this.itemURL = itemURL;
+    }
+
+    public List<String> getColors() {
+        return colors;
+    }
+
+    public void setColors(List<String> colors) {
+        this.colors = colors;
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+
+    public String getReviewUrl() {
+        return reviewUrl;
+    }
+
+    public void setReviewUrl(String reviewUrl) {
+        this.reviewUrl = reviewUrl;
     }
 }

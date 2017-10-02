@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
@@ -118,10 +119,11 @@ public class UserController {
         return new ResponseEntity<User>(user, HttpStatus.OK);
     }
 
-    @RequestMapping(value="{nodeId}/getNavigationBoard" , method = RequestMethod.GET)
-    public ResponseEntity<?> getProductsNavigation(@PathVariable String nodeId){
+    @RequestMapping(value="{nodeId}/page/{page}/getNavigationBoard" , method = RequestMethod.GET)
+    public ResponseEntity<?> getProductsNavigation(@PathVariable String nodeId ,@PathVariable String page,
+                                                   @RequestParam("searchIndex") String searchIndex){
 
-        List<Product> products  =  userService.getProductsNavigation(nodeId);
+        List<Product> products  =  userService.getProductsNavigation(nodeId,page,searchIndex);
         return new ResponseEntity<List<Product>>(products,HttpStatus.OK);
     }
 

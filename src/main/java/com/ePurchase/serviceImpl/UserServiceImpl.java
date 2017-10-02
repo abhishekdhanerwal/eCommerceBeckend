@@ -145,12 +145,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<Product> getProductsNavigation(String nodeId){
+    public List<Product> getProductsNavigation(String nodeId, String page, String searchIndex){
         String url = null;
         if(isEmpty(nodeId)){
             throw new BadClientDataException("Invalid node Id.");
         }
-        url = ItemLookupUtility.getRequestUrlForSearchIndexId(nodeId);
+        if(isEmpty(page)){
+            throw new BadClientDataException("Invalid page no.");
+        }
+
+        if(isEmpty(searchIndex)){
+            throw new BadClientDataException("Invalid searchIndex.");
+        }
+        url = ItemLookupUtility.getRequestUrlForSearchIndexId(nodeId,page,searchIndex);
         List<Product> productList = ItemLookupUtility.fetchTitle(url);
         return productList;
 

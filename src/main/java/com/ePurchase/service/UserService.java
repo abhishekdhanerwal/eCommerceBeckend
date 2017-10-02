@@ -30,5 +30,5 @@ public interface UserService {
 
     List<Product> getCartItems(String userId);
 
-    List<Product> getProductsNavigation(String nodeId);
+    List<Product> getProductsNavigation(String nodeId, String page, String searchIndex);
 }

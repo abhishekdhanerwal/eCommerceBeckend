@@ -11,6 +11,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,7 @@ public class ItemLookupUtility {
     private static final String ITEM_ID = "0545010225";
 
 
-    public static  String getRequestUrlForSearchIndexId(String browseNodeId) {
+    public static  String getRequestUrlForSearchIndexId(String browseNodeId, String page, String searchIndex) {
 
         SignedRequestsHelper helper = getSignedRequestHelper();
         String requestUrl = null;
@@ -40,11 +41,11 @@ public class ItemLookupUtility {
         params.put("AWSAccessKeyId", ACCESS_KEY_ID);
         params.put("AssociateTag", "vijender9423-21");
         params.put("BrowseNodeId", browseNodeId);
-        params.put("SearchIndex", "Apparel");
+        params.put("SearchIndex", searchIndex);
         params.put("Sort", "-price");
-        params.put("ItemPage", "1");
+        params.put("ItemPage", page);
         params.put("Keywords", "Apparel");
-        params.put("ResponseGroup", "Images,ItemAttributes,Offers");
+        params.put("ResponseGroup", "Images,ItemAttributes,Offers,Reviews");
         requestUrl = helper.sign(params);
 
 /*        params.put("Service", "AWSECommerceService");
@@ -91,13 +92,27 @@ public class ItemLookupUtility {
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
                     Element eElement = (Element) nNode;
                     productInfo = eElement.getElementsByTagName("DetailPageURL").item(0).getTextContent();
-                    product.setImageUrl(productInfo);
+                    product.setItemURL(productInfo);
                     productInfo = eElement.getElementsByTagName("Title").item(0).getTextContent();
                     product.setTitle(productInfo);
                     productInfo = eElement.getElementsByTagName("ASIN").item(0).getTextContent();
                     product.setAsinId(productInfo);
+                    if(eElement.getElementsByTagName("Brand").getLength()>0){
+                        productInfo = eElement.getElementsByTagName("Brand").item(0).getTextContent();
+                        product.setBrand(productInfo);
+                    }
+                    if(eElement.getElementsByTagName("Color").getLength()>0){
+                        List<String> colorList = getColorList(eElement.getElementsByTagName("Color").item(0)
+                                .getTextContent());
+                        product.setColors(colorList);
+                    }
+                    if(eElement.getElementsByTagName("IFrameURL").getLength() > 0){
+                        productInfo = eElement.getElementsByTagName("IFrameURL").item(0).getTextContent();
+                        product.setReviewUrl(productInfo);
+                    }
                     if (eElement.getElementsByTagName("LargeImage").getLength() > 0) {
-                        productInfo = eElement.getElementsByTagName("LargeImage").item(0).getTextContent();
+                        Element imageUrl = (Element) eElement.getElementsByTagName("LargeImage").item(0);
+                        productInfo = imageUrl.getElementsByTagName("URL").item(0).getTextContent();
                         product.setImageUrl(productInfo);
                     }
                     if (eElement.getElementsByTagName("LowestNewPrice").getLength() > 0) {
@@ -115,6 +130,12 @@ public class ItemLookupUtility {
             throw new RuntimeException(e);
         }
         return productList;
+    }
+
+    private static List<String> getColorList(String color) {
+
+        List<String> colorList = Arrays.asList(color.split(","));
+        return colorList;
     }
 
     private static void setProductFeatures(Product product, Element eElement) {
