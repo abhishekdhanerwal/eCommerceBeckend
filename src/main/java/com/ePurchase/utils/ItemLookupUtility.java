@@ -40,11 +40,12 @@ public class ItemLookupUtility {
         params.put("Operation", "ItemSearch");
         params.put("AWSAccessKeyId", ACCESS_KEY_ID);
         params.put("AssociateTag", "vijender9423-21");
-        params.put("BrowseNodeId", browseNodeId);
+        params.put("BrowseNode", browseNodeId);
         params.put("SearchIndex", searchIndex);
         params.put("Sort", "-price");
         params.put("ItemPage", page);
-        params.put("Keywords", "Apparel");
+      //  params.put("Keywords", searchIndex);
+        params.put("Availability ", "Available");
         params.put("ResponseGroup", "Images,ItemAttributes,Offers,Reviews");
         requestUrl = helper.sign(params);
 

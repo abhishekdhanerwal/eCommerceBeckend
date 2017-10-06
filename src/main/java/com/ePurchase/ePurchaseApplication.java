@@ -47,9 +47,9 @@ public class ePurchaseApplication extends WebSecurityConfigurerAdapter {
 
 
         http
-                .httpBasic().and().addFilterAfter(corsFilter(),ChannelProcessingFilter.class)
+                .httpBasic().and().addFilterBefore(corsFilter(),ChannelProcessingFilter.class)
                 .authorizeRequests()
-                .antMatchers("/**").permitAll()
+                .antMatchers("/login" , "/user/signup","/user/{nodeId}/page/{page}/getNavigationBoard").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .logout().permitAll().and()
