@@ -35,21 +35,32 @@ public class ItemLookupUtility {
         SignedRequestsHelper helper = getSignedRequestHelper();
         String requestUrl = null;
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("Service", "AWSECommerceService");
+       Map<String, String> params = new HashMap<String, String>();
+       params.put("Service", "AWSECommerceService");
         params.put("Operation", "ItemSearch");
         params.put("AWSAccessKeyId", ACCESS_KEY_ID);
         params.put("AssociateTag", "vijender9423-21");
         params.put("BrowseNode", browseNodeId);
         params.put("SearchIndex", searchIndex);
-        params.put("Sort", "-price");
+        params.put("Sort", "price");
         params.put("ItemPage", page);
-      //  params.put("Keywords", searchIndex);
         params.put("Availability ", "Available");
-        params.put("ResponseGroup", "Images,ItemAttributes,Offers,Reviews");
+       // params.put("ResponseGroup","VariationSummary, Medium, Images");*/
+       params.put("ResponseGroup", "Images,ItemAttributes,Offers,Reviews");
+/*
+        params.put("Service", "AWSECommerceService");
+        params.put("Operation", "ItemLookup");
+        params.put("AWSAccessKeyId", ACCESS_KEY_ID);
+        params.put("AssociateTag", "vijender9423-21");
+        params.put("ItemId","B01B31EA9Q");
+        params.put("IdType","ASIN");
+        params.put("ResponseGroup", "ItemAttributes,Images");*/
+
         requestUrl = helper.sign(params);
 
-/*        params.put("Service", "AWSECommerceService");
+
+
+        /*        params.put("Service", "AWSECommerceService");
         params.put("Version", "2009-03-31");
         params.put("Operation", "BrowseNodeLookup");
         params.put("AWSAccessKeyId", ACCESS_KEY_ID);
@@ -120,7 +131,7 @@ public class ItemLookupUtility {
                         Element priceElement = (Element) eElement.getElementsByTagName("LowestNewPrice").item(0);
                         if (priceElement.getElementsByTagName("FormattedPrice").getLength() > 0) {
                             productInfo = priceElement.getElementsByTagName("FormattedPrice").item(0).getTextContent();
-                            product.setAmount(productInfo);
+                           // product.setAmount(productInfo);
                         }
                     }
                     setProductFeatures(product, eElement);
@@ -163,5 +174,79 @@ public class ItemLookupUtility {
         params.put("ResponseGroup", "Images,ItemAttributes,Offers");
         requestUrl = helper.sign(params);
         return requestUrl;
+    }
+
+    public static String getTotalPage(String url){
+
+        String totalPages = "";
+        try {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document doc = db.parse(url);
+            totalPages = doc.getElementsByTagName("TotalPages").item(0).getTextContent();
+        }
+        catch(Exception e){
+            throw new RuntimeException(e);
+        }
+        return totalPages;
+    }
+
+    public static String getRequestUrlForAllNodeProducts(String nodeId, String pageNo, String sort, String searchIndex) {
+
+        SignedRequestsHelper helper = getSignedRequestHelper();
+        String requestUrl = null;
+
+        Map<String, String> params = new HashMap<String, String>();
+
+        params.put("Service", "AWSECommerceService");
+        params.put("Operation", "ItemSearch");
+        params.put("AWSAccessKeyId", ACCESS_KEY_ID);
+        params.put("AssociateTag", "vijender9423-21");
+        params.put("ItemPage",pageNo);
+        params.put("Sort",sort);
+        params.put("BrowseNode", nodeId);
+        params.put("SearchIndex", searchIndex);
+        params.put("ResponseGroup", "Images,Medium,VariationSummary");
+
+        requestUrl = helper.sign(params);
+        System.out.println("RequestUrl********* - "+requestUrl);
+        return requestUrl;
+    }
+
+    public static String getRequestURlToGetAllVariationASINs(String asinId) {
+
+        SignedRequestsHelper helper = getSignedRequestHelper();
+        String requestUrl = null;
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("Service", "AWSECommerceService");
+        params.put("Operation", "ItemLookup");
+        params.put("AWSAccessKeyId", ACCESS_KEY_ID);
+        params.put("AssociateTag", "vijender9423-21");
+        params.put("ItemId",asinId);
+        params.put("IdType","ASIN");
+        params.put("ResponseGroup", "VariationMatrix");
+
+        requestUrl = helper.sign(params);
+        return requestUrl;
+    }
+
+    public static String getRequestURlUsingAsin(String itreableAsinId) {
+
+        SignedRequestsHelper helper = getSignedRequestHelper();
+        String requestUrl = null;
+
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("Service", "AWSECommerceService");
+        params.put("Operation", "ItemLookup");
+        params.put("AWSAccessKeyId", ACCESS_KEY_ID);
+        params.put("AssociateTag", "vijender9423-21");
+        params.put("ItemId",itreableAsinId);
+        params.put("IdType","ASIN");
+        params.put("ResponseGroup", "ItemAttributes,Images,Offers,Reviews");
+        requestUrl = helper.sign(params);
+        System.out.println("Your Request URL is **** "+requestUrl);
+        return requestUrl;
+
+
     }
 }

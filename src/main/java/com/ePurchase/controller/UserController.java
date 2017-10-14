@@ -119,25 +119,41 @@ public class UserController {
         return new ResponseEntity<User>(user, HttpStatus.OK);
     }
 
-    @RequestMapping(value="{nodeId}/page/{page}/getNavigationBoard" , method = RequestMethod.GET)
-    public ResponseEntity<?> getProductsNavigation(@PathVariable String nodeId ,@PathVariable String page,
-                                                   @RequestParam("searchIndex") String searchIndex){
+    @RequestMapping(value = "{nodeId}/page/{page}/getNavigationBoard", method = RequestMethod.GET)
+    public ResponseEntity<?> getProductsNavigation(@PathVariable String nodeId, @PathVariable String page,
+                                                   @RequestParam("searchIndex") String searchIndex) {
 
-        List<Product> products  =  userService.getProductsNavigation(nodeId,page,searchIndex);
-        return new ResponseEntity<List<Product>>(products,HttpStatus.OK);
+        List<Product> products = userService.getProductsNavigation(nodeId, page, searchIndex);
+        return new ResponseEntity<List<Product>>(products, HttpStatus.OK);
     }
 
-    @RequestMapping(value="/{userId}/addToCart", method = RequestMethod.POST)
-    public ResponseEntity<?> addItemToCart(@PathVariable String userId, @RequestBody String itemId){
-        User user = userService.addItemToCart(userId,itemId);
-        return new ResponseEntity<User>(user,HttpStatus.OK);
+    @RequestMapping(value = "/node/{nodeId}/page/{pageNo}/getAllProducts", method = RequestMethod.GET)
+    public ResponseEntity<?> getAllProducts(@PathVariable String nodeId, @PathVariable String pageNo, @RequestParam
+            ("sort") String sort, @RequestParam("searchIndex") String searchIndex) {
+        List<Product> products = userService.getAllProductsForNode(nodeId, pageNo, sort, searchIndex);
+        return new ResponseEntity<List<Product>>(products, HttpStatus.OK);
     }
 
-    @RequestMapping(value="/{userId}/getCartItems", method = RequestMethod.GET)
-    public ResponseEntity<?> getCartItems(@PathVariable String userId){
+    @RequestMapping(value = "/asin/{asinId}/getAllVariationProducts", method = RequestMethod.GET)
+    public ResponseEntity<?> getAllVariationProducts(@PathVariable String asinId) {
+        Map<String, Object> productsMap = userService.getAllVariationProducts(asinId);
+        if (productsMap.containsKey("msg")) {
+            return new ResponseEntity<String>((String) productsMap.get("msg"), HttpStatus.OK);
+        }
+        return new ResponseEntity<Map<String, Object>>(productsMap, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{userId}/addToCart", method = RequestMethod.POST)
+    public ResponseEntity<?> addItemToCart(@PathVariable String userId, @RequestBody String itemId) {
+        User user = userService.addItemToCart(userId, itemId);
+        return new ResponseEntity<User>(user, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{userId}/getCartItems", method = RequestMethod.GET)
+    public ResponseEntity<?> getCartItems(@PathVariable String userId) {
 
         List<Product> productList = userService.getCartItems(userId);
-        return new ResponseEntity<List<Product>>(productList,HttpStatus.OK);
+        return new ResponseEntity<List<Product>>(productList, HttpStatus.OK);
 
     }
 }

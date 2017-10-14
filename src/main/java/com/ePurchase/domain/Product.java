@@ -17,18 +17,20 @@ public class Product {
     private List<String> feature = new ArrayList<>();
     private List<String> colors = new ArrayList<>();
     private String brand;
-    private String amount;
+    private String lowestPrice;
+    private String highestPrice;
+    private String salePrice;
     private String reviewUrl;
 
     public Product() {
     }
 
-    public String getAmount() {
-        return amount;
+    public String getLowestPrice() {
+        return lowestPrice;
     }
 
-    public void setAmount(String amount) {
-        this.amount = amount;
+    public void setLowestPrice(String lowestPrice) {
+        this.lowestPrice = lowestPrice;
     }
 
     public List<String> getFeature() {
@@ -93,5 +95,21 @@ public class Product {
 
     public void setReviewUrl(String reviewUrl) {
         this.reviewUrl = reviewUrl;
+    }
+
+    public String getHighestPrice() {
+        return highestPrice;
+    }
+
+    public void setHighestPrice(String highestPrice) {
+        this.highestPrice = highestPrice;
+    }
+
+    public String getSalePrice() {
+        return salePrice;
+    }
+
+    public void setSalePrice(String salePrice) {
+        this.salePrice = salePrice;
     }
 }
