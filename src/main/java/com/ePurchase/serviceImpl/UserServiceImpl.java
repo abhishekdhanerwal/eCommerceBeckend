@@ -222,7 +222,14 @@ public class UserServiceImpl implements UserService {
         List<SingleProduct> productList = new ArrayList<>();
         requestUrl = ItemLookupUtility.getRequestURlToGetAllVariationASINs(asinId);
         Map<String, Object> allVariationASINs = getAllVariationASINs(requestUrl);
-        if (allVariationASINs.containsKey("asinList")) {
+        if(allVariationASINs.containsKey("msg")){
+            requestUrl = ItemLookupUtility.getRequestURlUsingAsin(asinId);
+            product = getDetailsOfProducts(requestUrl);
+            productList.add(product);
+            allVariationASINs.put("product", productList);
+            allVariationASINs.remove("msg");
+        }
+        else if(allVariationASINs.containsKey("asinList")) {
             for (String itreableAsinId : (List<String>) allVariationASINs.get("asinList")) {
                 requestUrl = ItemLookupUtility.getRequestURlUsingAsin(itreableAsinId);
                 product = getDetailsOfProducts(requestUrl);
